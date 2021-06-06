@@ -27,7 +27,22 @@ def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_fo
 
 
 def main():
-    pass
+    input_folder_path = Path(INPUT_FOLDER)
+    intro_folder_path = Path(INTRO_FOLDER)
+    outro_folder_path = Path(OUTRO_FOLDER)
+    output_folder_path = Path(OUTPUT_FOLDER)
+    output_folder_path.mkdir(exist_ok=True)
+
+    intro_paths = [p for p in intro_folder_path.iterdir() if p.is_file()]
+    outro_paths = [p for p in outro_folder_path.iterdir() if p.is_file()]
+
+    for video in input_folder_path.iterdir():
+        if not video.is_file():
+            continue
+
+        selected_intro = random.choice(intro_paths)
+        selected_outro = random.choice(outro_paths)
+        add_intro_outro(video, selected_intro, selected_outro, output_folder_path)
 
 
 if __name__ == '__main__':
