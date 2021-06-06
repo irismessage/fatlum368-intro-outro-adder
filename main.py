@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 INPUT_FOLDER = 'input'
@@ -33,7 +33,7 @@ def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_fo
             f"file '{outro_path.resolve().as_posix()}'\n"
         )
 
-    command = f'ffmpeg -f concat -safe 0 -i {concat_file_path} -c:v copy -c:a copy {out_file_path}'
+    command = f'ffmpeg -y -f concat -safe 0 -i {concat_file_path} -c:v copy -c:a copy {out_file_path}'
     os.system(command)
 
     concat_file_path.unlink()
