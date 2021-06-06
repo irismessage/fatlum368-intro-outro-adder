@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
+import os
 import random
 import argparse
 from pathlib import Path
 
-import ffmpeg
 
-
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 
 INPUT_FOLDER = 'input'
@@ -34,9 +33,8 @@ def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_fo
             f"file '{outro_path.resolve().as_posix()}'\n"
         )
 
-    stream = ffmpeg.input(str(concat_file_path), format='concat', safe=0)
-    stream = ffmpeg.output(stream, str(out_file_path), c='copy')
-    ffmpeg.run(stream)
+    command = f'ffmpeg -f concat -safe 0 -i {concat_file_path} -c:v copy -c:a copy {out_file_path}'
+    os.system(command)
 
     concat_file_path.unlink()
 
