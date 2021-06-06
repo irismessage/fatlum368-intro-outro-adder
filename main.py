@@ -6,6 +6,10 @@ import argparse
 from pathlib import Path
 
 
+# todo: add threading?
+# todo: add concat filter option?
+
+
 __version__ = '0.3.0'
 
 
