@@ -29,12 +29,12 @@ def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_fo
     concat_file_path = out_file_path.with_stem(video_path.stem + '-concat').with_suffix('.txt')
     with open(concat_file_path, 'w') as concat_file:
         concat_file.write(
-            f"file '{video_path}'"
-            f"file '{intro_path}'"
-            f"file '{outro_path}'\n"
+            f"file '{intro_path.resolve().as_posix()}'\n"
+            f"file '{video_path.resolve().as_posix()}'\n"
+            f"file '{outro_path.resolve().as_posix()}'\n"
         )
 
-    stream = ffmpeg.input(str(concat_file), format='concat', safe=0)
+    stream = ffmpeg.input(str(concat_file_path), format='concat', safe=0)
     stream = ffmpeg.output(stream, str(out_file_path), c='copy')
     ffmpeg.run(stream)
 
