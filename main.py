@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
 import random
+import argparse
 from pathlib import Path
+
 import ffmpeg
+
+
+__version__ = '0.1.0'
 
 
 INPUT_FOLDER = 'input'
@@ -11,7 +16,15 @@ OUTRO_FOLDER = 'outros'
 OUTPUT_FOLDER = 'output'
 
 
+def get_parser() -> argparse.ArgumentParser:
+    """Return argument parser for this script."""
+    parser = argparse.ArgumentParser(description='batch add intros and outros to videos with ffmpeg')
+    parser.add_argument('--version', action='version', version=__version__)
+    return parser
+
+
 def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_folder_path: Path):
+    """Add intro and outro to video and save to the out folder, using ffmpeg's concat demuxer."""
     out_file_path = out_folder_path / video_path.name
     concat_file_path = out_file_path.with_stem(video_path.stem + '-concat').with_suffix('.txt')
     with open(concat_file_path, 'w') as concat_file:
@@ -27,6 +40,9 @@ def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_fo
 
 
 def main():
+    """Run the script."""
+    get_parser().parse_args()
+
     input_folder_path = Path(INPUT_FOLDER)
     intro_folder_path = Path(INTRO_FOLDER)
     outro_folder_path = Path(OUTRO_FOLDER)
