@@ -38,6 +38,8 @@ def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_fo
     stream = ffmpeg.output(stream, str(out_file_path), c='copy')
     ffmpeg.run(stream)
 
+    concat_file_path.unlink()
+
 
 def main():
     """Run the script."""
