@@ -6,17 +6,17 @@ import argparse
 from pathlib import Path
 
 
-# todo: add threading?
-# todo: add concat filter option?
+# todo: add folders etc. as argparse options
 
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 
 INPUT_FOLDER = 'input'
 INTRO_FOLDER = 'intros'
 OUTRO_FOLDER = 'outros'
 OUTPUT_FOLDER = 'output'
+RESOLUTION = '1280:720'
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -26,21 +26,36 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def add_intro_outro(video_path: Path, intro_path: Path, outro_path: Path, out_folder_path: Path):
-    """Add intro and outro to video and save to the out folder, using ffmpeg's concat demuxer."""
+def add_intro_outro(
+        video_path: Path, intro_path: Path, outro_path: Path, out_folder_path: Path, resolution: str = RESOLUTION
+):
+    """Add intro and outro to video and save to the out folder, using ffmpeg's concat demuxer.
+
+    Resolution should be in the form width:height eg '1280:720'
+    """
     out_file_path = out_folder_path / video_path.name
-    concat_file_path = out_file_path.with_stem(video_path.stem + '-concat').with_suffix('.txt')
-    with open(concat_file_path, 'w') as concat_file:
-        concat_file.write(
-            f"file '{intro_path.resolve().as_posix()}'\n"
-            f"file '{video_path.resolve().as_posix()}'\n"
-            f"file '{outro_path.resolve().as_posix()}'\n"
-        )
-
-    command = f'ffmpeg -y -f concat -safe 0 -i {concat_file_path} -c:v copy -c:a copy {out_file_path}'
+    # original: https://video.stackexchange.com/questions/28153/batch-add-intro-and-outro-to-videos
+    # ffmpeg -y -i %INTRO% -i "%%a" -filter_complex
+    # "[0:v]scale=1280:720:force_original_aspect_ratio=1,pad=1280:720:(ow-iw)/2:(oh-ih)/2[v0];
+    # [1:v]scale=1280:720:force_original_aspect_ratio=1,pad=1280:720:(ow-iw)/2:(oh-ih)/2[v1];
+    # [v0][0:a][v1][1:a]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" %OUTPUT_FOLDER%\\%%~na.mp4"
+    command = (
+        'ffmpeg -y '
+        f'-i "{intro_path}" '
+        f'-i "{video_path}" '
+        f'-i "{outro_path}" '
+        '-filter_complex "'
+        f'[0:v]scale={resolution}:force_original_aspect_ratio=1,pad={resolution}:(ow-iw)/2:(oh-ih)/2[v0]; '
+        f'[1:v]scale={resolution}:force_original_aspect_ratio=1,pad={resolution}:(ow-iw)/2:(oh-ih)/2[v1]; '
+        f'[2:v]scale={resolution}:force_original_aspect_ratio=1,pad={resolution}:(ow-iw)/2:(oh-ih)/2[v2]; '
+        '[v0][0:a][v1][1:a][v2][2:a]concat=n=3:v=1:a=1[v][a]'
+        '" '
+        '-map "[v]" '
+        '-map "[a]" '
+        f'"{out_file_path}"'
+    )
+    print(command)
     os.system(command)
-
-    concat_file_path.unlink()
 
 
 def main():
