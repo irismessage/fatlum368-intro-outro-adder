@@ -6,10 +6,7 @@ import argparse
 from pathlib import Path
 
 
-# todo: add folders etc. as argparse options
-
-
-__version__ = '0.4.0'
+__version__ = '1.0.0'
 
 
 INPUT_FOLDER = 'input'
@@ -23,6 +20,28 @@ def get_parser() -> argparse.ArgumentParser:
     """Return argument parser for this script."""
     parser = argparse.ArgumentParser(description='batch add intros and outros to videos with ffmpeg')
     parser.add_argument('--version', action='version', version=__version__)
+
+    parser.add_argument(
+        '--input-folder', dest='input_folder', type=Path, default=INPUT_FOLDER,
+        help='folder from which to get videos to add intros and outros to'
+    )
+    parser.add_argument(
+        '--intros-folder', dest='intros_folder', type=Path, default=INTRO_FOLDER,
+        help='folder to randomly select intros from'
+    )
+    parser.add_argument(
+        '--outros-folder', dest='outros_folder', type=Path, default=OUTRO_FOLDER,
+        help='folder to randomly select outros from'
+    )
+    parser.add_argument(
+        '--output-folder', dest='output_folder', type=Path, default=OUTPUT_FOLDER,
+        help='folder to output videos with intros and outros added'
+    )
+    parser.add_argument(
+        '--resolution', dest='resolution', default=RESOLUTION,
+        help='output resolution in the form width:height'
+    )
+
     return parser
 
 
@@ -59,16 +78,7 @@ def add_intro_outro(
     os.system(command)
 
 
-def main():
-    """Run the script."""
-    get_parser().parse_args()
-
-    input_folder_path = Path(INPUT_FOLDER)
-    intro_folder_path = Path(INTRO_FOLDER)
-    outro_folder_path = Path(OUTRO_FOLDER)
-    output_folder_path = Path(OUTPUT_FOLDER)
-    output_folder_path.mkdir(exist_ok=True)
-
+def add_to_folders(input_folder_path: Path, intro_folder_path: Path, outro_folder_path: Path, output_folder_path: Path):
     intro_paths = [p for p in intro_folder_path.iterdir() if p.is_file()]
     outro_paths = [p for p in outro_folder_path.iterdir() if p.is_file()]
 
@@ -79,6 +89,19 @@ def main():
         selected_intro = random.choice(intro_paths)
         selected_outro = random.choice(outro_paths)
         add_intro_outro(video, selected_intro, selected_outro, output_folder_path)
+
+
+def main():
+    """Run the script."""
+    args = get_parser().parse_args()
+
+    input_folder_path = args.input_folder
+    intro_folder_path = args.intros_folder
+    outro_folder_path = args.outros_folder
+    output_folder_path = args.output_folder
+    output_folder_path.mkdir(exist_ok=True)
+
+    add_to_folders(input_folder_path, intro_folder_path, outro_folder_path, output_folder_path)
 
 
 if __name__ == '__main__':
