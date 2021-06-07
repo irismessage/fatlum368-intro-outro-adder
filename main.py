@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 
 INPUT_VIDEOS_FOLDER = 'input'
@@ -50,6 +50,7 @@ def replace_audio(video_path: Path, audio_path: Path, out_folder_path: Path):
 
 
 def replace_in_folder(input_folder_path: Path, audio_folder_path: Path, output_folder_path: Path):
+    # this will yield the next video from the folder in a loop
     audio_cycle = itertools.cycle([a for a in audio_folder_path.iterdir() if a.is_file()])
 
     for video in input_folder_path.iterdir():
