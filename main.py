@@ -50,6 +50,7 @@ def add_intro_outro(
         f'[2:v]scale={resolution}:force_original_aspect_ratio=1,pad={resolution}:(ow-iw)/2:(oh-ih)/2[v2]; '
         '[v0][0:a][v1][1:a][v2][2:a]concat=n=3:v=1:a=1[v][a]'
         '" '
+        '-vsync 2 '
         '-map "[v]" '
         '-map "[a]" '
         f'"{out_file_path}"'
