@@ -39,8 +39,12 @@ def replace_audio(video_path: Path, audio_path: Path, out_folder_path: Path):
     """Replace audio of video and save to the out folder, using ffmpeg."""
     out_file_path = out_folder_path / video_path.name
 
-    # todo: implement
-    command = ''
+    command = (
+        'ffmpeg '
+        f'-i {video_path} -i {audio_path} '
+        '-shortest -c:v copy -c:a copy -map 0:v:0 -map 1:a:0 '
+        f'{out_file_path}'
+    )
     print(command)
     os.system(command)
 
