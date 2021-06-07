@@ -6,12 +6,13 @@ import argparse
 from pathlib import Path
 
 
-__version__ = '2.0.1'
+__version__ = '2.1.0'
 
 
 INPUT_VIDEOS_FOLDER = 'input'
 INPUT_AUDIO_FOLDER = 'audio'
 OUTPUT_FOLDER = 'output'
+VOLUME = 0.5
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -31,25 +32,30 @@ def get_parser() -> argparse.ArgumentParser:
         '--output-folder', dest='output_folder', type=Path, default=OUTPUT_FOLDER,
         help='folder to output videos with intros and outros added'
     )
+    parser.add_argument(
+        '--volume', dest='volume', type=float, default=VOLUME,
+        help='audio volume adjustment'
+    )
 
     return parser
 
 
-def replace_audio(video_path: Path, audio_path: Path, out_folder_path: Path):
+def replace_audio(video_path: Path, audio_path: Path, out_folder_path: Path, volume: float = 1):
     """Replace audio of video and save to the out folder, using ffmpeg."""
     out_file_path = out_folder_path / video_path.name
 
     command = (
         'ffmpeg -y '
         f'-i "{video_path}" -i "{audio_path}" '
-        '-shortest -c:v copy -c:a copy -map 0:v:0 -map 1:a:0 '
+        f'-filter:a "volume={volume}" '
+        '-shortest -c:v copy -map 0:v:0 -map 1:a:0 '
         f'"{out_file_path}"'
     )
     print(command)
     os.system(command)
 
 
-def replace_in_folder(input_folder_path: Path, audio_folder_path: Path, output_folder_path: Path):
+def replace_in_folder(input_folder_path: Path, audio_folder_path: Path, output_folder_path: Path, volume: float):
     # this will yield the next video from the folder in a loop
     audio_cycle = itertools.cycle([a for a in audio_folder_path.iterdir() if a.is_file()])
 
@@ -58,7 +64,7 @@ def replace_in_folder(input_folder_path: Path, audio_folder_path: Path, output_f
             continue
 
         replacement_audio = next(audio_cycle)
-        replace_audio(video, replacement_audio, output_folder_path)
+        replace_audio(video, replacement_audio, output_folder_path, volume)
 
 
 def main():
@@ -70,7 +76,7 @@ def main():
     output_folder_path = args.output_folder
     output_folder_path.mkdir(exist_ok=True)
 
-    replace_in_folder(input_folder_path, audio_folder_path, output_folder_path)
+    replace_in_folder(input_folder_path, audio_folder_path, output_folder_path, args.volume)
 
 
 if __name__ == '__main__':
