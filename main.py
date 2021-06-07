@@ -48,7 +48,7 @@ def get_parser() -> argparse.ArgumentParser:
 def add_intro_outro(
         video_path: Path, intro_path: Path, outro_path: Path, out_folder_path: Path, resolution: str = RESOLUTION
 ):
-    """Add intro and outro to video and save to the out folder, using ffmpeg's concat demuxer.
+    """Add intro and outro to video and save to the out folder, using ffmpeg's concat filter.
 
     Resolution should be in the form width:height eg '1280:720'
     """
