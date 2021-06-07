@@ -46,7 +46,7 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def add_intro_outro(
-        video_path: Path, intro_path: Path, outro_path: Path, out_folder_path: Path, resolution: str = RESOLUTION
+        video_path: Path, intro_path: Path, outro_path: Path, out_folder_path: Path, resolution: str
 ):
     """Add intro and outro to video and save to the out folder, using ffmpeg's concat filter.
 
@@ -78,7 +78,10 @@ def add_intro_outro(
     os.system(command)
 
 
-def add_to_folders(input_folder_path: Path, intro_folder_path: Path, outro_folder_path: Path, output_folder_path: Path):
+def add_to_folders(
+        input_folder_path: Path, intro_folder_path: Path, outro_folder_path: Path, output_folder_path: Path,
+        resolution: str
+):
     intro_paths = [p for p in intro_folder_path.iterdir() if p.is_file()]
     outro_paths = [p for p in outro_folder_path.iterdir() if p.is_file()]
 
@@ -88,7 +91,7 @@ def add_to_folders(input_folder_path: Path, intro_folder_path: Path, outro_folde
 
         selected_intro = random.choice(intro_paths)
         selected_outro = random.choice(outro_paths)
-        add_intro_outro(video, selected_intro, selected_outro, output_folder_path)
+        add_intro_outro(video, selected_intro, selected_outro, output_folder_path, resolution)
 
 
 def main():
@@ -101,7 +104,9 @@ def main():
     output_folder_path = args.output_folder
     output_folder_path.mkdir(exist_ok=True)
 
-    add_to_folders(input_folder_path, intro_folder_path, outro_folder_path, output_folder_path)
+    resolution = args.resolution
+
+    add_to_folders(input_folder_path, intro_folder_path, outro_folder_path, output_folder_path, resolution)
 
 
 if __name__ == '__main__':
